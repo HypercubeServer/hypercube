@@ -19,7 +19,6 @@ class PacketField {
 }  
 
 class Packet {
-    static Packet[] packets;
     
     enum To : string{
         Server = "Server",
@@ -45,38 +44,53 @@ class Packet {
         this.to = to;
         this.fields = fields;
     }
+    
+    override string toString() {
+        return "Packet(" ~ name ~ ": " ~ state ~ to ~ ")";
+    }
 }
 
 void parseProtocol(char[] s) {
     JSONValue p = parseJSON(s);
     // TODO: Find a better way to do this
     //parsePackets(p["states"]["handshaking"]["toClient"], Packet.State.HandShake, Packet.To.Client);
-    parsePackets(p["states"]["handshaking"]["toServer"], Packet.State.HandShake, Packet.To.Server);
-    parsePackets(p["states"]["status"]["toClient"], Packet.State.Status, Packet.To.Client);
-    parsePackets(p["states"]["status"]["toServer"], Packet.State.Status, Packet.To.Server);
-    parsePackets(p["states"]["login"]["toClient"], Packet.State.Login, Packet.To.Client);
-    parsePackets(p["states"]["login"]["toServer"], Packet.State.Login, Packet.To.Server);
-    parsePackets(p["states"]["play"]["toClient"], Packet.State.Play, Packet.To.Client);
-    parsePackets(p["states"]["play"]["toServer"], Packet.State.Play, Packet.To.Server);
-}
-
-void parsePackets(JSONValue packets, Packet.State s, Packet.To t) {
-    foreach(name, packet; packets.object) {
-        parsePacket(name, packet, s, t);
+    Packet[] packets;
+    packets ~= parsePackets(p["states"]["handshaking"]["toServer"], Packet.State.HandShake, Packet.To.Server);
+    packets ~= parsePackets(p["states"]["status"]["toClient"], Packet.State.Status, Packet.To.Client);
+    packets ~= parsePackets(p["states"]["status"]["toServer"], Packet.State.Status, Packet.To.Server);
+    packets ~= parsePackets(p["states"]["login"]["toClient"], Packet.State.Login, Packet.To.Client);
+    packets ~= parsePackets(p["states"]["login"]["toServer"], Packet.State.Login, Packet.To.Server);
+    packets ~= parsePackets(p["states"]["play"]["toClient"], Packet.State.Play, Packet.To.Client);
+    packets ~= parsePackets(p["states"]["play"]["toServer"], Packet.State.Play, Packet.To.Server);
+    
+    foreach(packet; packets) {
+        log(packet.toString());
     }
 }
 
-void parsePacket(string name, JSONValue packet, Packet.State s, Packet.To t) {
+Packet[] parsePackets(JSONValue packets, Packet.State s, Packet.To t) {
+    Packet[] packetObjects;
+    foreach(name, packet; packets.object) {
+        packetObjects ~= parsePacket(name, packet, s, t);
+    }
+    /*foreach(packet; packetObjects) {
+        log(packet.toString());
+    }*/
+    return packetObjects;
+}
+
+Packet parsePacket(string name, JSONValue packet, Packet.State s, Packet.To t) {
     auto id = to!ubyte(packet["id"].str.split("x")[1], 16);
-    if(id != 0) return;
     //log(s ~ " " ~ t ~ " " ~ name ~ "(" ~ to!string(id) ~ ")");
     PacketField[] fields;
     foreach(field; packet["fields"].array) {
-        string fieldName = field["name"].str;
-        string fieldType = field["type"].str;
-        fields ~= new PacketField(fieldName, fieldType);
+        try{
+            string fieldName = field["name"].str;
+            string fieldType = field["type"].str;
+            fields ~= new PacketField(fieldName, fieldType);
+        } catch(Exception e) {
+            // TODO: Handle buffers and other types of data
+        }
     }
-    foreach(field; fields) {
-        log(field.toString());
-    }
+    return new Packet(name, id, s, t, fields);
 }
