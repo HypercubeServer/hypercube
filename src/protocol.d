@@ -52,8 +52,6 @@ class Packet {
 
 void parseProtocol(char[] s) {
     JSONValue p = parseJSON(s);
-    // TODO: Find a better way to do this
-    //parsePackets(p["states"]["handshaking"]["toClient"], Packet.State.HandShake, Packet.To.Client);
     Packet[] packets;
     packets ~= parsePackets(p["states"]["handshaking"]["toServer"], Packet.State.HandShake, Packet.To.Server);
     packets ~= parsePackets(p["states"]["status"]["toClient"], Packet.State.Status, Packet.To.Client);

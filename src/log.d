@@ -8,9 +8,7 @@ void setDebug(bool t) {
 }
 
 void log(string s) {
-    if(d) {
-        writeln("  [DEBUG] " ~ s);
-    }
+    if(d) writeln("  [DEBUG] " ~ s);
 }
 
 void info(string s) {

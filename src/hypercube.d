@@ -4,11 +4,17 @@ import protocol;
 import std.stdio;
 import std.file;
 import std.json;
+import std.algorithm;
+import std.string;
+import std.conv;
 import core.stdc.stdlib;
 
 string VERSION = "1.8-0.0.1"; ///Version of Hypercube
+string HOSTNAME = "localhost";
+int PORT = 25565;
 
 void setupPackets() {
+    info("Initializing protocol structure");
     string protocolFileLocation = "minecraft-data/data/1.8/protocol.json"; /// Specific location protocol.json
     if(exists(protocolFileLocation) != 0) { /// protocol.json exists
         log("Found protocol.json");
@@ -24,16 +30,27 @@ void parseArguments(char[][] args) {
         if(w == "-debug" || w == "-d") {
             setDebug(true);
         }
+        else if(w.startsWith("-h=")){
+            HOSTNAME = (to!string(w).split("-h="))[1];
+        }
+        else if(w.startsWith("-p=")){
+            PORT = to!int((to!string(w).split("-p="))[1]);
+        }
     }
+}
+
+void setupSockets() {
+    info("Opening socket at " ~ HOSTNAME ~ ":" ~ to!string(PORT));
+    /*auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
+    listener.bind(new InternetAddress(HOSTNAME, PORT));
+    lister.listen(10);
+    auto readSet = new SocketSet();*/
 }
 
 int main(char[][] args) {
     writeln("\n Hypercube v" ~ VERSION ~ " initializing...\n");
     parseArguments(args);
-    /*auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
-    listener.bind(new InternetAddress("localhost", 25565));
-    lister.listen(10);
-    auto readSet = new SocketSet();*/
     setupPackets();
+    setupSockets();
     return 0;
 }
