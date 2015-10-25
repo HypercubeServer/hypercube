@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+rm -rf dist/*.exe
+dmd src/*.d -of./dist/hypercube.exe
+dist/hypercube
