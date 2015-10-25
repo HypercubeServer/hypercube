@@ -19,9 +19,17 @@ void setupPackets() {
     }
 }
 
+void parseArguments(char[][] args) {
+    foreach(w; args) {
+        if(w == "-debug") {
+            setDebug(true);
+        }
+    }
+}
+
 int main(char[][] args) {
     writeln("\n Hypercube v" ~ VERSION ~ " initializing...\n");
-    setDebug(true);
+    parseArguments(args);
     /*auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
     listener.bind(new InternetAddress("localhost", 25565));
     lister.listen(10);

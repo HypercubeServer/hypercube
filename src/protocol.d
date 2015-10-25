@@ -1,6 +1,8 @@
 module protocol;
 import logger;
 import std.json;
+import std.conv : to;
+import std.string;
 
 class PacketField {
     string name;
@@ -46,5 +48,6 @@ void parsePackets(JSONValue packets, Packet.State s, Packet.To t) {
 }
 
 void parsePacket(JSONValue packet, Packet.State s, Packet.To t) {
+    auto id = to!ubyte(packet["id"].str.split("x")[1], 16);
     log(s ~ " " ~ t ~ " " ~ packet["id"].str);
 }
