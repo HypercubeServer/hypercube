@@ -46,7 +46,7 @@ class Packet {
     }
     
     override string toString() {
-        return "Packet(" ~ name ~ ": " ~ state ~ to ~ ")";
+        return state ~ to ~ "Packet: " ~ name ~ "(" ~ std.conv.to!string(id) ~ ")";
     }
 }
 
