@@ -7,9 +7,20 @@ import std.string;
 class PacketField {
     string name;
     string type;
-}
+    
+    this(string n, string t) {
+        name = n;
+        type = t;
+    }
+    
+    override string toString() {
+        return name ~ ": " ~ type;
+    }
+}  
 
 class Packet {
+    static Packet[] packets;
+    
     enum To : string{
         Server = "Server",
         Client = "Client",
@@ -26,6 +37,14 @@ class Packet {
     string name;
     ubyte id;
     PacketField[] fields;
+    
+    this(string name, ubyte id, State state, To to, PacketField[] fields) {
+        this.name = name;
+        this.id = id;
+        this.state = state;
+        this.to = to;
+        this.fields = fields;
+    }
 }
 
 void parseProtocol(char[] s) {
@@ -49,5 +68,15 @@ void parsePackets(JSONValue packets, Packet.State s, Packet.To t) {
 
 void parsePacket(string name, JSONValue packet, Packet.State s, Packet.To t) {
     auto id = to!ubyte(packet["id"].str.split("x")[1], 16);
-    log(s ~ " " ~ t ~ " " ~ name ~ "(" ~ to!string(id) ~ ")");
+    if(id != 0) return;
+    //log(s ~ " " ~ t ~ " " ~ name ~ "(" ~ to!string(id) ~ ")");
+    PacketField[] fields;
+    foreach(field; packet["fields"].array) {
+        string fieldName = field["name"].str;
+        string fieldType = field["type"].str;
+        fields ~= new PacketField(fieldName, fieldType);
+    }
+    foreach(field; fields) {
+        log(field.toString());
+    }
 }
