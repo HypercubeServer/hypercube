@@ -9,12 +9,12 @@ void setDebug(bool t) {
 
 void log(string s) {
     if(d) {
-        writeln(" [DEBUG] " ~ s);
+        writeln("  [DEBUG] " ~ s);
     }
 }
 
 void info(string s) {
-    writeln(" [INFO] " ~ s);
+    writeln("  [INFO] " ~ s);
 }
 
 void warning(string s) {

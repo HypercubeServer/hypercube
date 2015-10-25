@@ -42,12 +42,12 @@ void parseProtocol(char[] s) {
 }
 
 void parsePackets(JSONValue packets, Packet.State s, Packet.To t) {
-    foreach(packet; packets.object) {
-        parsePacket(packet, s, t);
+    foreach(name, packet; packets.object) {
+        parsePacket(name, packet, s, t);
     }
 }
 
-void parsePacket(JSONValue packet, Packet.State s, Packet.To t) {
+void parsePacket(string name, JSONValue packet, Packet.State s, Packet.To t) {
     auto id = to!ubyte(packet["id"].str.split("x")[1], 16);
-    log(s ~ " " ~ t ~ " " ~ packet["id"].str);
+    log(s ~ " " ~ t ~ " " ~ name ~ "(" ~ to!string(id) ~ ")");
 }

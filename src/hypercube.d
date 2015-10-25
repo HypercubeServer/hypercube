@@ -11,7 +11,7 @@ string VERSION = "1.8-0.0.1"; ///Version of Hypercube
 void setupPackets() {
     string protocolFileLocation = "minecraft-data/data/1.8/protocol.json"; /// Specific location protocol.json
     if(exists(protocolFileLocation) != 0) { /// protocol.json exists
-        info("Found protocol.json");
+        log("Found protocol.json");
         parseProtocol(cast(char[]) read(protocolFileLocation));
     } else { /// protocol.json doesn't exist
         error("Can't find protocol.json in " ~ protocolFileLocation);
@@ -21,7 +21,7 @@ void setupPackets() {
 
 void parseArguments(char[][] args) {
     foreach(w; args) {
-        if(w == "-debug") {
+        if(w == "-debug" || w == "-d") {
             setDebug(true);
         }
     }
