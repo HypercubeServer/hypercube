@@ -93,18 +93,3 @@ Packet parsePacket(string name, JSONValue packet, Packet.State s, Packet.To t) {
     }
     return new Packet(name, id, s, t, fields);
 }
-
-int readVarInt(ubyte[] data, int *ptr) {
-    int i = 0;
-    int j = 0;
-    while(true) {
-        int k = data[*ptr];
-        *ptr += 1;
-        i |= (k & 0x7F) << j++ * 7;
-        if(j > 5) {
-            error("VarInt is too big");
-        }
-        if((k & 0x80) != 128) break;
-    }
-    return i;
-}
