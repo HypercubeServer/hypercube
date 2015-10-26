@@ -47,12 +47,12 @@ void setupSockets() {
     server.listen(1024);
     server.run((s) {
         ubyte[1024] buffer;
+        int ptr = 0;
         s.receive(buffer);
-        log("Data Recieved:");
         foreach(b;buffer){
-            write(to!string(b));
+            auto r = readVarInt(buffer, &ptr);
+            write(to!string(r) ~ " ");
         }
-        //writeln(cast(string)buffer);
     });
 }
 
