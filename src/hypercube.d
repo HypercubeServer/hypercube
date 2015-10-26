@@ -49,9 +49,11 @@ void setupSockets() {
         ubyte[1024] buffer;
         int ptr = 0;
         s.receive(buffer);
-        foreach(b;buffer){
-            auto r = readVarInt(buffer, &ptr);
-            write(to!string(r) ~ " ");
+        int size = readVarInt(buffer, &ptr); /// size of packet
+        int id = readVarInt(buffer, &ptr); /// packet id
+        int protocolVersion = readVarInt(buffer, &ptr); /// protocol version
+        if(id == 0) {
+            writeln("Packet Id: " ~ to!string(id) ~ "\nPacket Size: " ~ to!string(size) ~ "\nProtocol Version: " ~ to!string(protocolVersion));
         }
     });
 }
