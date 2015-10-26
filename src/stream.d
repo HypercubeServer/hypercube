@@ -17,7 +17,11 @@ ubyte read(ubyte[] data, int *ptr) {
 byte[] readFully(ubyte[] data, int *ptr, int len) {
     byte[] b;
     int n = 0;
-    while(n < len) b ~= data[*ptr + len];
+    while(n < len) {
+        b ~= data[*ptr];
+        *ptr += 1;
+        n++;
+    }
     return b;
 }
 
