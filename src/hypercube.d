@@ -1,17 +1,19 @@
 module hypercube;
 import logger;
 import protocol;
+import tcpserver;
 import std.stdio;
 import std.file;
 import std.json;
 import std.algorithm;
 import std.string;
 import std.conv;
+import std.socket;
 import core.stdc.stdlib;
 
 string VERSION = "1.8-0.0.1"; ///Version of Hypercube
 string HOSTNAME = "localhost";
-int PORT = 25565;
+ushort PORT = 25565;
 
 void setupPackets() {
     info("Initializing protocol structure");
@@ -34,17 +36,24 @@ void parseArguments(char[][] args) {
             HOSTNAME = (to!string(w).split("-h="))[1];
         }
         else if(w.startsWith("-p=")){
-            PORT = to!int((to!string(w).split("-p="))[1]);
+            PORT = to!ushort((to!string(w).split("-p="))[1]);
         }
     }
 }
 
 void setupSockets() {
     info("Opening socket at " ~ HOSTNAME ~ ":" ~ to!string(PORT));
-    /*auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
-    listener.bind(new InternetAddress(HOSTNAME, PORT));
-    lister.listen(10);
-    auto readSet = new SocketSet();*/
+    auto server = new TcpServer(HOSTNAME, PORT);
+    server.listen(1024);
+    server.run((s) {
+        ubyte[1024] buffer;
+        s.receive(buffer);
+        log("Data Recieved:");
+        foreach(b;buffer){
+            write(to!string(b));
+        }
+        //writeln(cast(string)buffer);
+    });
 }
 
 int main(char[][] args) {
