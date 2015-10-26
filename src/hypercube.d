@@ -53,9 +53,9 @@ void setupSockets() {
         int size = readVarInt(buffer, &ptr); /// size of packet
         int id = readVarInt(buffer, &ptr); /// packet id
         int protocolVersion = readVarInt(buffer, &ptr); /// protocol version
-        //string address = readString(buffer, &ptr);
+        string address = readString(buffer, &ptr);
         if(id == 0) {
-            writeln("Packet Id: " ~ to!string(id) ~ "\nPacket Size: " ~ to!string(size) ~ "\nProtocol Version: " ~ to!string(protocolVersion) /*~ "\nAddress: " ~ address*/);
+            writeln("Packet Id: " ~ to!string(id) ~ "\nPacket Size: " ~ to!string(size) ~ "\nProtocol Version: " ~ to!string(protocolVersion) ~ "\nAddress: " ~ address);
         }
         /*ptr = 0;
         while(ptr <= buffer.length) {

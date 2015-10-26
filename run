@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 rm -rf dist/*.exe
-dmd src/*.d -of./dist/hypercube.exe
+dmd src/*.d -of./dist/hypercube.exe -v
 dist/hypercube -debug -h=localhost -p=25565
