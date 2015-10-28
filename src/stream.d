@@ -65,64 +65,7 @@ int readInt(ubyte[] data, int *ptr) {
 }
 
 string readString(ubyte[] data, int *ptr) {
-    writeln("s; Starting readString()");
-    int len = readUnsignedShort(data, ptr);
-    writeln("s; read unsigned short: " ~ to!string(len));
-    byte[] bytearr = readFully(data, ptr, len);
-    char[] chararr;
-    int c, char2, char3;
-    int count = 0;
-    writeln("s; initialized variables");
-    
-    while(count < len) {
-        write("\nca: " ~ chararr ~ " c:");
-        c = cast(int)bytearr[count] & 0xff;
-        writeln(c);
-        if(c > 127) break;
-        count++;
-        chararr ~= c;
-    }
-    writeln("\ns; went through one loop");
-    while(count < len) {
-        c = cast(int)bytearr[count] & 0xff;
-        switch(c >> 4) {
-            case 0: case 1: case 2: case 3: case 4:case 6: case 7:
-                /* 0xxxxxxx */
-                count++;
-                chararr ~= cast(char)c;
-                break;
-            case 12: case 13:
-                /* 110x xxxx  10xx xxxx */
-                count += 2;
-                if(count > len) {
-                    error("UTF Data is improperly formatted: Partial character at end");
-                }
-                
-                char2 = cast(int) bytearr[count-1];
-                if((char2 & 0xc0) != 0x80) {
-                    error("UTF Data is improperly formatted: Malformed byte around " ~ to!string(count));
-                }
-                chararr ~= cast(char)(((c & 0x1f) << 6) | (char2 & 0x3f));
-                break;
-            case 14:
-                /* 1110 xxxx  10xx xxxx  10xx xxxx */
-                count += 3;
-                if(count > len) {
-                    error("UTF Data is improperly formatted: Partial character at end");
-                }
-                char2 = cast(int) bytearr[count-2];
-                char3 = cast(int) bytearr[count-1];
-                if(((char2 & 0xc0) != 0x80) || ((char3 & 0xc0) != 0x80)) {
-                    error("UTF Data is improperly formatted: Malformed byte around " ~ to!string(count-1));
-                }
-                chararr ~= cast(char)(((c & 0x0f) << 12) | ((char2 & 0x3f) << 6) | (char3 & 0x3f));
-                break;
-            default:
-                /* 10xx xxxx,  1111 xxxx */
-                error("UTF Data is improperly formatted: Malformed byte around " ~ to!string(count));
-        }
-    } 
-    //The number of chars produced may be less than len
-    log(chararr.idup);
-    return chararr.idup;
+    int len = readVarInt(data, ptr);
+    char[] chars = to!(char[])(readFully(data, ptr, len));
+    return std.utf.toUTF8(chars);
 }
