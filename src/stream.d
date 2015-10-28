@@ -2,6 +2,7 @@ module stream;
 import logger;
 import std.stdio;
 import std.conv;
+import std.utf;
 
 /*
  * Most of this file is based off of the Java 8 DataInputStream
@@ -15,12 +16,11 @@ ubyte read(ubyte[] data, int *ptr) {
 }
 
 byte[] readFully(ubyte[] data, int *ptr, int len) {
-    byte[] b;
+    byte[len] b;
     int n = 0;
     while(n < len) {
-        b ~= data[*ptr];
+        b[n++] = data[*ptr];
         *ptr += 1;
-        n++;
     }
     return b;
 }
@@ -33,7 +33,7 @@ int readVarInt(ubyte[] data, int *ptr) {
         *ptr += 1;
         i |= (k & 0x7F) << j++ * 7;
         if(j > 5) {
-            error("VarInt is too big");
+            throw new Exception("VarInt is too big");
         }
         if((k & 0x80) != 128) break;
     }
@@ -44,7 +44,7 @@ int readUnsignedShort(ubyte[] data, int *ptr) {
     ubyte ch1 = read(data, ptr);
     ubyte ch2 = read(data, ptr);
     if((ch1 | ch2) < 0) {
-        error("EOF when reading Unsigned Short");
+        throw new Exception("EOF when reading Unsigned Short");
     }
     return (ch1 << 8) + ch2;
 }
@@ -59,7 +59,7 @@ int readInt(ubyte[] data, int *ptr) {
     int ch3 = read(data, ptr);
     int ch4 = read(data, ptr);
     if((ch1 | ch2 | ch3 | ch4) < 0) {
-        error("EOF when reading Integer");
+        throw new Exception("EOF when reading Integer");
     }
     return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + ch4);
 }
@@ -67,5 +67,5 @@ int readInt(ubyte[] data, int *ptr) {
 string readString(ubyte[] data, int *ptr) {
     int len = readVarInt(data, ptr);
     char[] chars = to!(char[])(readFully(data, ptr, len));
-    return std.utf.toUTF8(chars);
+    return toUTF8(chars);
 }
