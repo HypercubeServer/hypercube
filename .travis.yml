@@ -1,5 +1,5 @@
 language: D
 d: dmd
-script: ./build
+script: ./hypercube build
 notifications:
   email: false
