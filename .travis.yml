@@ -1,0 +1,5 @@
+language: D
+d: dmd
+script: ./build
+notifications:
+  email: false
