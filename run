@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+if [ ! -f "/dist/hypercube.exe" ]; then
+    ./build
+fi
+if [ -f "/dist/hypercube.exe" ]; then
+    dist/hypercube -debug -h=localhost -p=25565
+fi
