@@ -20,7 +20,6 @@ class PacketField {
 }  
 
 class Packet {
-    
     enum To : string{
         Server = "Server",
         Client = "Client",
@@ -45,10 +44,26 @@ class Packet {
         this.to = to;
         this.fields = fields;
     }
-    
+
+    ubyte getId() {
+        return id;
+    }
+
     override string toString() {
         return state ~ to ~ "Packet: " ~ name ~ "(" ~ std.conv.to!string(id) ~ ")";
     }
+}
+
+Packet[] allPackets;
+
+Packet getPacketById(ubyte id) {
+    foreach(p; allPackets) {
+        if(p.getId()) {
+            return p;
+        }
+    }
+    error("Unknown Packet Id: " ~ to!string(id));
+    return null;
 }
 
 void parseProtocol(char[] s) {
@@ -61,7 +76,9 @@ void parseProtocol(char[] s) {
     packets ~= parsePackets(p["states"]["login"]["toServer"], Packet.State.Login, Packet.To.Server);
     packets ~= parsePackets(p["states"]["play"]["toClient"], Packet.State.Play, Packet.To.Client);
     packets ~= parsePackets(p["states"]["play"]["toServer"], Packet.State.Play, Packet.To.Server);
-    
+
+    allPackets = packets;
+
     foreach(packet; packets) {
         log(packet.toString());
     }
