@@ -12,13 +12,13 @@ import std.conv;
 import std.socket;
 import core.stdc.stdlib;
 
-string VERSION = "1.8-0.0.1"; ///Version of Hypercube
+string VERSION = "15w40b-0.0.1"; ///Version of Hypercube
 string HOSTNAME = "localhost";
 ushort PORT = 25565;
 
 void setupPackets() {
     info("Initializing protocol structure");
-    string protocolFileLocation = "minecraft-data/data/1.8/protocol.json"; /// Specific location protocol.json
+    string protocolFileLocation = "minecraft-data/data/1.9/protocol.json"; /// Specific location protocol.json
     if(exists(protocolFileLocation) != 0) { /// protocol.json exists
         log("Found protocol.json");
         parseProtocol(cast(char[]) read(protocolFileLocation));
