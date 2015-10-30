@@ -5,6 +5,7 @@ import protocol;
 import tcpserver;
 import std.stdio;
 import std.file;
+import std.base64;
 import std.json;
 import std.algorithm;
 import std.string;
@@ -62,6 +63,12 @@ void setupSockets() {
             write(to!string(readVarInt(buffer, &ptr)) ~ " ");
         }*/
     });
+}
+
+char[] getFavicon() {
+    ubyte[] img = cast(ubyte[]) read("favicon.png");
+    string faviconPrefix = "data:image/png;base64,";
+    return faviconPrefix ~ Base64.encode(img);
 }
 
 int main(char[][] args) {
