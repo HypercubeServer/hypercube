@@ -11,16 +11,21 @@ hc_help() {
 hc_build() {
     rm -rf dist/
     #TODO: Use other compilers
-    dmd src/*.d -of./dist/hypercube.exe -v
+    dmd src/*.d -of./dist/hypercube.exe #-v
 }
 
 hc_run() {
-    if [ ! -f "/dist/hypercube.exe" ]; then
+    if [ -f "/dist/hypercube.exe" ]; then
         hc_build
     fi
-    if [ -f "/dist/hypercube.exe" ]; then
+    if [ ! -f "/dist/hypercube.exe" ]; then
         dist/hypercube -debug -h=localhost -p=25565
     fi
+}
+
+hc_reboot() {
+    hc_build
+    hc_run
 }
 
 if [ -z $1 ]; then

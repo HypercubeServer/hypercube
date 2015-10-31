@@ -31,11 +31,11 @@ class PacketField {
 }  
 
 class Packet {
-    enum To : string{
+    enum To : string {
         Server = "Server",
         Client = "Client",
     }
-    enum State : string{
+    enum State : string {
         HandShake = "HandShake",
         Status = "Status",
         Login = "Login",
@@ -76,11 +76,12 @@ class Packet {
     }
 }
 
-Packet[] allPackets;
+Packet[] allPackets = void;
 
 Packet getPacketById(ubyte id) {
     foreach(p; allPackets) {
-        if(p.getId()) {
+        log(to!string(p.getId()));
+        if(p.getId() == id) {
             return p;
         }
     }
@@ -98,9 +99,10 @@ void parseProtocol(char[] s) {
     packets ~= parsePackets(p["states"]["login"]["toServer"], Packet.State.Login, Packet.To.Server);
     packets ~= parsePackets(p["states"]["play"]["toClient"], Packet.State.Play, Packet.To.Client);
     packets ~= parsePackets(p["states"]["play"]["toServer"], Packet.State.Play, Packet.To.Server);
-
+    
+    log("Packets Found: " ~ to!string(packets.length));
     allPackets = packets;
-
+    
     foreach(packet; packets) {
         log(packet.toString());
     }
@@ -137,10 +139,10 @@ class IncomingPacket {
     
     this(ubyte[] buffer) {
         this.data = buffer;
+        this.ptr = 0;
         int size = readVarInt(data, &ptr); /// size of packet
         int id = readVarInt(data, &ptr); /// packet id
         Packet p = getPacketById(cast(ubyte)id);
-        switch(id) {
-        }
+        log("Incoming Packet: " ~ to!string(id) ~ ":" ~ p.toString());
     }
 }

@@ -51,7 +51,8 @@ void setupSockets() {
         ubyte[1024] buffer;
         int ptr = 0;
         s.receive(buffer);
-        int size = readVarInt(buffer, &ptr); /// size of packet
+        new IncomingPacket(buffer);
+        /*int size = readVarInt(buffer, &ptr); /// size of packet
         int id = readVarInt(buffer, &ptr); /// packet id
         int protocolVersion = readVarInt(buffer, &ptr); /// protocol version
         string address = readString(buffer, &ptr); /// the client is stupid and sends the address to the address
@@ -65,7 +66,7 @@ void setupSockets() {
             "\nPort: " ~ to!string(port) ~
             "\nState: " ~ to!string(state)
             );
-        }
+        }*/
         /*ptr = 0;
         while(ptr <= buffer.length) {
             write(to!string(readVarInt(buffer, &ptr)) ~ " ");
