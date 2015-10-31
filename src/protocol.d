@@ -6,6 +6,7 @@ import std.conv : to;
 import std.typecons;
 import std.string;
 import std.array;
+import std.algorithm;
 
 class PacketField {
     string name;
@@ -16,12 +17,20 @@ class PacketField {
         type = t;
     }
     
+    string getName() {
+        return name;
+    }
+    
+    string getType() {
+        return type;
+    }
+    
     override string toString() {
         return name ~ ": " ~ type;
     }
 }  
 
-class PacketTemplate {
+class Packet {
     enum To : string{
         Server = "Server",
         Client = "Client",
@@ -42,9 +51,7 @@ class PacketTemplate {
     this(string name, ubyte id, State state, To to, PacketField[] fields) {
         string[] d = name.split("_");
         string j;
-        foreach(e;d){
-            j ~= capitalize(e);
-        }
+        foreach(e;d) j ~= capitalize(e);
         this.name = j;
         this.id = id;
         this.state = state;
@@ -56,6 +63,10 @@ class PacketTemplate {
         return id;
     }
     
+    PacketField[] getFields() {
+        return fields;
+    }
+    
     string getName() {
         return name ~ "Packet";
     }
@@ -65,10 +76,10 @@ class PacketTemplate {
     }
 }
 
-PacketTemplate[] allPacketTemplate;
+Packet[] allPackets;
 
-PacketTemplate getPacketTemplateById(ubyte id) {
-    foreach(p; allPacketTemplate) {
+Packet getPacketById(ubyte id) {
+    foreach(p; allPackets) {
         if(p.getId()) {
             return p;
         }
@@ -79,36 +90,31 @@ PacketTemplate getPacketTemplateById(ubyte id) {
 
 void parseProtocol(char[] s) {
     JSONValue p = parseJSON(s);
-    PacketTemplate[] packets;
-    packets ~= parsePackets(p["states"]["handshaking"]["toServer"], PacketTemplate.State.HandShake, PacketTemplate.To.Server);
-    packets ~= parsePackets(p["states"]["status"]["toClient"], PacketTemplate.State.Status, PacketTemplate.To.Client);
-    packets ~= parsePackets(p["states"]["status"]["toServer"], PacketTemplate.State.Status, PacketTemplate.To.Server);
-    packets ~= parsePackets(p["states"]["login"]["toClient"], PacketTemplate.State.Login, PacketTemplate.To.Client);
-    packets ~= parsePackets(p["states"]["login"]["toServer"], PacketTemplate.State.Login, PacketTemplate.To.Server);
-    packets ~= parsePackets(p["states"]["play"]["toClient"], PacketTemplate.State.Play, PacketTemplate.To.Client);
-    packets ~= parsePackets(p["states"]["play"]["toServer"], PacketTemplate.State.Play, PacketTemplate.To.Server);
+    Packet[] packets;
+    packets ~= parsePackets(p["states"]["handshaking"]["toServer"], Packet.State.HandShake, Packet.To.Server);
+    packets ~= parsePackets(p["states"]["status"]["toClient"], Packet.State.Status, Packet.To.Client);
+    packets ~= parsePackets(p["states"]["status"]["toServer"], Packet.State.Status, Packet.To.Server);
+    packets ~= parsePackets(p["states"]["login"]["toClient"], Packet.State.Login, Packet.To.Client);
+    packets ~= parsePackets(p["states"]["login"]["toServer"], Packet.State.Login, Packet.To.Server);
+    packets ~= parsePackets(p["states"]["play"]["toClient"], Packet.State.Play, Packet.To.Client);
+    packets ~= parsePackets(p["states"]["play"]["toServer"], Packet.State.Play, Packet.To.Server);
 
-    allPacketTemplate = packets;
+    allPackets = packets;
 
     foreach(packet; packets) {
         log(packet.toString());
     }
-    
-    
 }
 
-PacketTemplate[] parsePackets(JSONValue packets, PacketTemplate.State s, PacketTemplate.To t) {
-    PacketTemplate[] packetObjects;
+Packet[] parsePackets(JSONValue packets, Packet.State s, Packet.To t) {
+    Packet[] packetObjects;
     foreach(name, packet; packets.object) {
         packetObjects ~= parsePacket(name, packet, s, t);
     }
-    /*foreach(packet; packetObjects) {
-        log(packet.toString());
-    }*/
     return packetObjects;
 }
 
-PacketTemplate parsePacket(string name, JSONValue packet, PacketTemplate.State s, PacketTemplate.To t) {
+Packet parsePacket(string name, JSONValue packet, Packet.State s, Packet.To t) {
     auto id = to!ubyte(packet["id"].str.split("x")[1], 16);
     //log(s ~ " " ~ t ~ " " ~ name ~ "(" ~ to!string(id) ~ ")");
     PacketField[] fields;
@@ -121,16 +127,20 @@ PacketTemplate parsePacket(string name, JSONValue packet, PacketTemplate.State s
             // TODO: Handle buffers and other types of data
         }
     }
-    return new PacketTemplate(name, id, s, t, fields);
+    return new Packet(name, id, s, t, fields);
 }
 
 class IncomingPacket {
 
+    ubyte[] data = void;
     int ptr = 0;
     
     this(ubyte[] buffer) {
-        int size = readVarInt(buffer, &ptr); /// size of packet
-        int id = readVarInt(buffer, &ptr); /// packet id
-        
+        this.data = buffer;
+        int size = readVarInt(data, &ptr); /// size of packet
+        int id = readVarInt(data, &ptr); /// packet id
+        Packet p = getPacketById(cast(ubyte)id);
+        switch(id) {
+        }
     }
 }
