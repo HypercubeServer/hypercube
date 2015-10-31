@@ -16,11 +16,12 @@ ubyte read(ubyte[] data, int *ptr) {
 }
 
 byte[] readFully(ubyte[] data, int *ptr, int len) {
-    byte[len] b;
+    byte[] b;
     int n = 0;
     while(n < len) {
-        b[n++] = data[*ptr];
+        b ~= data[*ptr];
         *ptr += 1;
+        n++;
     }
     return b;
 }
@@ -67,5 +68,5 @@ int readInt(ubyte[] data, int *ptr) {
 string readString(ubyte[] data, int *ptr) {
     int len = readVarInt(data, ptr);
     char[] chars = to!(char[])(readFully(data, ptr, len));
-    return toUTF8(chars);
+    return (cast(char[])(cast(byte[])toUTF8(chars))).idup;
 }

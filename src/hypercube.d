@@ -54,9 +54,17 @@ void setupSockets() {
         int size = readVarInt(buffer, &ptr); /// size of packet
         int id = readVarInt(buffer, &ptr); /// packet id
         int protocolVersion = readVarInt(buffer, &ptr); /// protocol version
-        string address = readString(buffer, &ptr);
+        string address = readString(buffer, &ptr); /// the client is stupid and sends the address to the address
+        int port = readUnsignedShort(buffer, &ptr);
+        int state = readVarInt(buffer, &ptr);
         if(id == 0) {
-            writeln("Packet Id: " ~ to!string(id) ~ "\nPacket Size: " ~ to!string(size) ~ "\nProtocol Version: " ~ to!string(protocolVersion) ~ "\nAddress: " ~ address);
+            writeln("Packet Id: " ~ to!string(id) ~ 
+            "\nPacket Size: " ~ to!string(size) ~ 
+            "\nProtocol Version: " ~ to!string(protocolVersion) ~ 
+            "\nAddress: " ~ to!string(address) ~
+            "\nPort: " ~ to!string(port) ~
+            "\nState: " ~ to!string(state)
+            );
         }
         /*ptr = 0;
         while(ptr <= buffer.length) {
